@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html Lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width = device-width, initial-scale = 1.0">
+    <title>{{DetalleFactura}}</title>
+</head>
+
+<body>
+
+    <u1>
+        <l1><a href='/'>{{Menu}}</a></l1>
+        <l1><a href='/producto'>{{Producto}}</a></l1>
+        <l1><a href='/cliente'>{{Cliente}}</a></l1>
+        <l1><a href='/factura'>{{Factura}}</a></l1>
+        <l1><a href='/detallefactura'>{{DetalleFactura}}</a></l1>
+    </u1>
+    <h1>
+        {{DetalleFactura}}
+    </h1>
+    <form action = "" method = "post">
+        {%csrf_token %}
+        {{ form.as_p }}
+        <button type = "submit">Crear</button>
+    </form>
+    <l1><a href = '/admin/app/detallefactura/'>Consultar {{ DetalleFactura }}</a></l1>
+</body>
+
+</html>
