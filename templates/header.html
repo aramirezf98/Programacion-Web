@@ -1,0 +1,69 @@
+{% load static %}
+<nav class="navbar navbar-landing fixed-top navbar-expand-lg  navbar-dark bg-primary">
+    <a class="navbar-brand" href="#">
+        <span class="text-light font-weight-bold"><img src="{% static 'imagenes/logo.png' %}"
+                                                       width="18px">edical</span></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01"
+            aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarColor01">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item ">
+                <a class="btn btn-flat-info btn-small " data-toggle="tooltip" data-placement="bottom" title=""
+                   data-original-title="Menu Principal" href="{% url 'inicio' %}"><i class="fa fa-home text-white"></i> <span
+                        class="text-white">Inicio</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="btn btn-flat-info btn-small" data-toggle="tooltip" data-placement="bottom" title=""
+                   data-original-title="Atencion de Pacientes" href="{% url 'base:paciente' %}"><span
+                        class="text-white"><i class="fa fa-users"></i> Atencion</span></a>
+            </li>
+            <li class="nav-item">
+                <div class="btn-group" role="group" aria-label="Button group with nested dropdown ">
+                    <button type="button" class="btn btn-warning" data-toggle="tooltip" data-placement="right" title=""
+                            data-original-title="Reportes Gerenciales"><i class="fa fa-clipboard"></i> Agenda
+                    </button>
+                    <div class="btn-group show" role="group">
+                        <button id="btnGroupDrop1" type="button" class="btn btn-warning dropdown-toggle"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true"></button>
+                        <div class="dropdown-menu " aria-labelledby="btnGroupDrop1"
+                             style="position: absolute; transform: translate3d(0px, 34px, 0px); top: 0px; left: 0px; will-change: transform;"
+                             x-placement="bottom-start">
+                            <a class="dropdown-item" href="/base/horario/"><i class="fa fa-calendar"></i> Horarios</a>
+                            <a class="dropdown-item" href="/base/doctor/"><i class="fa fa-user-md"></i> Doctor</a>
+                            <a class="dropdown-item" href="/base/citas/"><i class="fa fa-medkit"></i> Citas</a>
+                            <a class="dropdown-item" href="/base/signos/"><i class="fa fa-file-medical-alt"></i> Signo Vitales</a>
+
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class=" btn btn-flat-info btn-small" data-toggle="tooltip" data-placement="top" title=""
+                   data-original-title="Administracion de Entidades" href="/admin"><span
+                        class="text-white"><i class="fa fa-cogs"></i> Administracion</span></a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item">
+                <a class="nav-link" href="#">29-08-2020</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#">
+                    <span class="inner">
+                        <img class="rounded" id="imgusuario" src="{% static 'imagenes/fotodaniel.jpeg' %}" width="20px">
+                    </span>
+                    Daniel
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="/logout/">
+                    <i class="fa fa-power-off"></i> Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
+<!-- menu vertical Sidenav -->

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block header %}
+{% include 'header.html' %}
+{% endblock %}
+{% block main %}
+{% load static %}
+<div class="container-fluid" style="margin-top: 3rem;">
+    <div class="card">
+        <div class="card-header bg-success text-light ">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3 class="font-weight-bold">Mantenimiento de Pacientes</h3>
+                </div>
+                <div class="col-md-4 ">
+                    <a href="{% url 'base:paciente' %}" class="btn btn-danger float-right"><i class="fa fa-arrow-left"></i> Cancelar</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="col-md-12">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <!-- {{ form.as_p }} -->
+                    <!-- <div class="form-group row">
+                        <label class="col-sm-2 col-form-label"
+                            for="id_{{ form.nombre.name }}">{{form.nombre.label}}</label>
+                        <div class="col-sm-4>
+                            {{form.nombre}} 
+                        </div>
+                        <label class="col-sm-2 col-form-label"
+                            for="id_{{ form.apellido.name }}">{{form.apellido.label}}</label>
+                        <div class="col-sm-4>
+                            {{form.apellido}} 
+                        </div>
+
+                    </div> -->
+                    {% if form.errors %}
+                    <div class="alert alert-warning alert-dismissible fade show mt-2" role="alert">
+                        <strong> {{ form.errors}}</strong>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endif %}
+                    {% for campo in form %}
+                    <div class="form-group row">
+                        <label class="col-md-2 col-form-label" for="id_{{ campo.name }}">{{campo.label}}</label>
+                        <div class="col-md-10">
+                            {{campo}}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <button class="btn btn-success btn-block" type="submit"><i class="fa fa-save"></i> Registrar</button>
+
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block jscript %}
+<script>
+
+        var nacimiento_ = $('#id_nacimiento');
+        if (nacimiento_.val() !== '') {
+            var nacimiento = nacimiento_.val().split('/');
+        }
+
+
+        $(function () {
+            nacimiento_.attr({"type": "date", "required": "required"});
+            if (nacimiento.length > 0) {
+                nacimiento_.val(`${nacimiento[2]}-${nacimiento[1]}-${nacimiento[0]}`);
+            }
+
+                $('#id_cedula').on('blur', function () {
+                    var cedula = $("#id_cedula").val();
+                    if (verificarCedula(cedula)) {
+                    } else {
+                        $("#id_cedula").val("");
+                        alert('Cedula no valida');
+                    }
+                });
+        })
+
+</script>
+{% endblock %}
