@@ -1,0 +1,394 @@
+{% extends 'base.html' %}
+{% block header %}
+{% include 'header.html' %}
+{% load static %}
+{% endblock %}
+
+{% block main %}
+
+<div class="container-fluid" style="margin-top: 3rem">
+    <div class="row">
+        <div class="col">
+            <div class="card ">
+                <div class="row bg-success text-light p-0">
+                    <div class="col-md-8 mt-3">
+                        <h3 class=" ml-2 font-italic font-weight-bold">
+                            Historia Clinica Del Paciente
+                        </h3>
+                    </div>
+                    <div class="col-md-4 ">
+                        <div class="float-right m-3">
+                            <a href="{% url 'base:paciente' %}" class="btn btn-warning">
+                                Cancelar
+                            </a>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="col-5">
+                    <div class="card mb-3 table-responsive">
+                        <div class=" row no-gutters">
+                            <div class="col-md-4">
+                                <img src="{% static 'imagenes/sinimagen.png' %}" class="img-thumbnail rounded-circle"
+                                    width="100%">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">Datos del Paciente</h5>
+                                    <p class="card-text">{{historia.paciente}}</p>
+                                    <p class="card-text"><small class="text-muted">Edad</small></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+
+                                <textarea class="form-control" id="id_notas_internas" placeholder="Notas Internas"
+                                    rows="3">{{historia.notasinterna}}</textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table class="table table-hover table-striped  m-1 ">
+                                <thead class="bg-success text-light">
+                                    <tr class="h5">
+                                        <th>Signo Vital</th>
+                                        <th>Valor Tomado</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="delegacion-container" id="contenedor">
+                                    <tr class="text-justify">
+                                        <td>Signo </td>
+                                        <td>Valor Registrado</td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-7">
+                    <div class="card table-responsive">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <hr>
+                                <button class="btn btn-success" id="id_limpiar">
+                                    Limpiar formulario
+                                </button>
+                                <hr>
+                                <form method="POST">
+                                    <div class="form-group row">
+                                        <div class="col-6">
+                                            <select class="form-control" id="id_grupo_antecedente">
+                                                <option selected value="0">Grupo Antecedente</option>
+
+                                                {% for grupo in lt_grupo_antecedentes %}
+                                                <option value="{{grupo.id}}">{{grupo}}</option>
+                                                {% endfor %}
+                                            </select>
+
+                                        </div>
+                                        <div class="col-6">
+                                            <select class="form-control" id="id_antecedente">
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <input type="text" class="form-control" placeholder="Escriba el antecedente"
+                                                id="id_descripcion_antecedente">
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary btn-block" type="button"
+                                        id="id_registrar_antecedente">Registrar
+                                        Antecedente</button>
+
+                                </form>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <table class="table table-hover table-striped  m-1 ">
+                                <thead class="bg-success text-light">
+                                    <tr class="h5">
+                                        <th>Antecedente</th>
+                                        <th>Descripcion</th>
+                                        <th class="text-center">Acciones</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody class="delegacion-container" id="id_contenedor">
+                                    <!-- <tr>
+                                        <td colspan="2">Patologicos</td>
+                                    </tr>
+                                    <tr class="text-justify fondo">
+                                        <td>Antecedentes Negados </td>
+                                        <td>Diabetis- cancer</td>
+                                    </tr>
+                                    <tr class="text-justify fondo">
+                                        <td>Hospitalizacion previa </td>
+                                        <td>Ninguna</td>
+                                    </tr> -->
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+                <button class="btn btn-primary btn-block" type="button" id="id_actualizar">Actualizar Historia</button>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdn.jsdelivr.net/npm/promise-polyfill"></script>
+{% endblock %}
+
+{% block jscript %}
+<script>
+
+    const c = console.log
+
+    let lt_historia_detalle = [],
+        id_seleccionado = 0,
+        por_editar = false,
+        lt_grupo_antecedente = [],
+        id_momentaneo = 0,
+        id_paciente = "{{historia.paciente_id}}",
+        token = "{{ csrf_token }}"
+
+    const cargar_combo = async (id_grupo_antecedente) => {
+
+        $("#id_antecedente").empty()
+
+        const response = await fetch(`{% url "atencion:historia" %}?action=data_antecedente&id_grupo_antecedente=${id_grupo_antecedente}`,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                    // 'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            }
+        )
+
+        const resultado = await response.json()
+        if (resultado.result == "ok") {
+            resultado.lt_antecedentes.forEach(elemento => {
+                $("#id_antecedente").append(`<option value="${elemento.id}">${elemento.descripcion}</option>`)
+            })
+        }
+    }
+
+    const limpiar_formulario = () => {
+        $("#id_grupo_antecedente").val(0)
+        $("#id_antecedente").empty()
+        $("#id_descripcion_antecedente").val("")
+        por_editar = false
+    }
+
+    const pintar_historia = (lt_historia_detalle) => {
+
+        $("#id_contenedor").empty()
+
+        lt_grupo_antecedente.forEach((el_grupo, index) => {
+
+            lt_historia_detalle.forEach((elemento, index) => {
+                if (el_grupo === elemento.id_grupo_antecedente) {
+
+                    $("#id_contenedor").append(
+                        `
+                        <tr class="text-justify fondo">
+                            <td>${elemento.grupo_antecedente} - ${elemento.antecedente} </td>
+                            <td>${elemento.descripcion}</td>
+                            <td>
+                                <a rel="action" data-json='{"accion":"edit" ,"id":"${elemento.id}"}'
+                                class="btn btn-danger btn-sm" href="#">Editar</a>
+                                <a rel="action" data-json='{"accion":"elim" ,"id":"${elemento.id}"}'
+                                class="btn btn-danger btn-sm" href="#">Eliminar</a>
+                            </td>
+                        </tr>
+                        `
+                    )
+                }
+
+            })
+        })
+
+        limpiar_formulario()
+
+    }
+
+    const add_historia = async (id_grupo_antecedente, grupo_antecedente, id_antecedente, antecedente, descripcion) => {
+
+        const data = {
+            id: id_momentaneo,
+            id_grupo_antecedente: id_grupo_antecedente,
+            grupo_antecedente: grupo_antecedente,
+            id_antecedente: id_antecedente,
+            antecedente: antecedente,
+            descripcion: descripcion
+        }
+
+        id_momentaneo = id_momentaneo + 1
+        lt_historia_detalle.push(data)
+        pintar_historia(lt_historia_detalle)
+    }
+
+    const edit_historia = (id, id_grupo_antecedente, grupo_antecedente, id_antecedente, antecedente, descripcion) => {
+
+        const data = {
+            id: id,
+            id_grupo_antecedente: id_grupo_antecedente,
+            grupo_antecedente: grupo_antecedente,
+            id_antecedente: id_antecedente,
+            antecedente: antecedente,
+            descripcion: descripcion
+        }
+
+        lt_historia_detalle = lt_historia_detalle.map((elemento, index) => {
+
+            if (index === id) {
+                return data
+            }
+            return elemento
+        })
+
+        pintar_historia(lt_historia_detalle)
+    }
+
+    const delete_historia = (id) => {
+
+        lt_historia_detalle = lt_historia_detalle.filter(elemento => elemento.id !== id)
+        pintar_historia(lt_historia_detalle)
+    }
+
+    const buscar_historia = (id) => {
+        return lt_historia_detalle.filter(elemento => elemento.id === id)[0]
+    }
+
+    $('#id_contenedor').on('click', 'a[rel="action"]', async function () {
+
+        let data = $(this).data('json'),
+            action = data.accion,
+            id = parseInt(data.id);
+
+        if (action === "elim") {
+            delete_historia(id)
+
+        } else if (action === "edit") {
+
+            const historia = buscar_historia(id)
+            por_editar = true
+            id_seleccionado = historia.id
+            $("#id_grupo_antecedente").val(historia.id_grupo_antecedente)
+
+            await cargar_combo(historia.id_grupo_antecedente)
+            $("#id_antecedente").val(historia.id_antecedente)
+            $("#id_descripcion_antecedente").val(historia.descripcion)
+        }
+
+
+    });
+
+    {% for obj_historia_detalle in lt_historia_detalle %}
+    lt_historia_detalle.push(
+        {
+            id: id_momentaneo,
+            id_grupo_antecedente: parseInt("{{ obj_historia_detalle.antecedente.grupoAntecedente_id }}"),
+            grupo_antecedente: "{{ obj_historia_detalle.antecedente.grupoAntecedente }}",
+            id_antecedente: parseInt("{{ obj_historia_detalle.antecedente_id }}"),
+            antecedente: "{{ obj_historia_detalle.antecedente }}",
+            descripcion: "{{ obj_historia_detalle.descripcion }}"
+        }
+    )
+    id_momentaneo = id_momentaneo + 1
+    {% endfor %}
+
+    {% for grupo in lt_grupo_antecedentes %}
+    lt_grupo_antecedente.push(parseInt("{{grupo.id}}"))
+    {% endfor %}
+
+    pintar_historia(lt_historia_detalle)
+
+    $(function () {
+
+
+        $("#id_registrar_antecedente").click(async function () {
+
+            const id_grupo_antecedente = parseInt($("#id_grupo_antecedente").val()),
+                grupo_antecedente = $("#id_grupo_antecedente option:selected").text(),
+                id_antecedente = parseInt($("#id_antecedente").val()),
+                antecedente = $("#id_antecedente option:selected").text(),
+                descripcion = $("#id_descripcion_antecedente").val()
+
+            if (descripcion.length > 0 && id_grupo_antecedente != 0) {
+                if (por_editar) {
+                    edit_historia(id_seleccionado, id_grupo_antecedente, grupo_antecedente, id_antecedente, antecedente, descripcion)
+                } else {
+                    add_historia(id_grupo_antecedente, grupo_antecedente, id_antecedente, antecedente, descripcion)
+                }
+            }
+            return false
+
+        })
+
+        $("#id_grupo_antecedente").change(async function () {
+
+            const id_grupo_antecedente = parseInt($(this).val())
+
+            if (id_grupo_antecedente !== 0) {
+
+                cargar_combo(id_grupo_antecedente)
+            }
+        })
+
+        $("#id_limpiar").click(async function () {
+
+            limpiar_formulario()
+
+        })
+
+        $("#id_actualizar").click(async function () {
+
+            const parametros = new FormData()
+            parametros.append("lt_historia", JSON.stringify(lt_historia_detalle))
+            parametros.append("id_paciente", id_paciente)
+            parametros.append("action", "update")
+            parametros.append("csrfmiddlewaretoken", token)
+            parametros.append("notas_internas", descripcion = $("#id_notas_internas").val())
+
+            const response = await fetch(`{% url "atencion:historia" %}`,
+                {
+                    method: "POST",
+                    body: parametros
+                }
+            )
+
+            const resultado = await response.json()
+            if (resultado.result == "ok") {
+                alert("Registro actualizado con exito")
+            }
+
+        })
+
+
+    })
+</script>
+{% endblock %}
